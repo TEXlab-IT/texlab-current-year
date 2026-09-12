@@ -1,10 +1,10 @@
 === Texlab Current Year ===
-Contributors: texlabit
-Tags: shortcode, year, current year, date
-Requires at least: 5.2
-Tested up to: 6.8
-Requires PHP: 7.2
-Stable tag: 1.1.0
+Contributors: texlab
+Tags: shortcode, year, current year, date, copyright
+Requires at least: 6.5
+Tested up to: 7.1
+Requires PHP: 7.4
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,11 +14,13 @@ Display the current year anywhere in your WordPress site using a simple shortcod
 
 Texlab Current Year is a lightweight WordPress plugin that allows you to display the current year anywhere on your website using a simple shortcode. This is particularly useful for copyright notices and other date-sensitive content that needs to be automatically updated each year.
 
+The year is calculated from the timezone configured in Settings > General, so it rolls over at midnight for your site rather than for the server.
+
 = Features =
 
 * Simple shortcode `[texlab_current_year]` to display the current year
-* Supports internationalization (i18n)
-* Lightweight and efficient
+* Uses the site's configured timezone
+* Lightweight and efficient: no options, no database queries, no assets loaded
 * No configuration needed
 * Works with any theme
 * Perfect for footer copyright notices
@@ -32,8 +34,11 @@ Example usage in a copyright notice:
 
 = Developers =
 
-* GitHub Repository: [Texlab Current Year on GitHub](https://github.com/texlabit/texlab-current-year)
-* Feel free to contribute to the development of this plugin
+The rendered year can be adjusted with the `texlab_current_year` filter:
+
+`add_filter( 'texlab_current_year', function ( $year ) { return $year; } );`
+
+GitHub repository: [Texlab Current Year on GitHub](https://github.com/TEXlab-IT/texlab-current-year)
 
 == Installation ==
 
@@ -49,22 +54,33 @@ Simply insert the shortcode `[texlab_current_year]` wherever you want the curren
 
 = Does this plugin slow down my website? =
 
-No, this plugin is very lightweight and only loads the minimal code needed to display the current year.
+No. The plugin registers a single shortcode and loads no scripts, styles or settings. It performs no database queries.
 
 = Can I use this in my theme's template files? =
 
 Yes, you can use the shortcode in template files by using the `do_shortcode()` function:
 `<?php echo do_shortcode('[texlab_current_year]'); ?>`
 
+= Which timezone is the year based on? =
+
+The year is generated with `wp_date()`, which uses the timezone set in Settings > General.
+
 = Does it support different date formats? =
 
-Currently, the plugin only displays the year in YYYY format. If you need different date formats, please contact us for feature requests.
-
-== Screenshots ==
-
-1. Example usage in footer copyright notice
+No. The shortcode outputs the year in YYYY format only. Developers who need something else can use the `texlab_current_year` filter.
 
 == Changelog ==
+
+= 1.2.0 =
+* Tested with WordPress 7.1.
+* Raised the minimum supported versions to WordPress 6.5 and PHP 7.4, as PHP 7.2 and 7.3 no longer receive security fixes.
+* The year is now generated with `wp_date()` so it respects the timezone configured in Settings > General instead of the server timezone.
+* The shortcode callback now explicitly discards any attributes passed to it, so no author-supplied value can reach the output.
+* Removed the activation and deactivation hooks that called `flush_rewrite_rules()`. The plugin registers no rewrite rules, so the call was unnecessary work on every activation.
+* Removed the unused plugin path and URL constants from the global namespace.
+* Removed the redundant `load_plugin_textdomain()` call. WordPress.org has served plugin translations automatically since WordPress 4.6.
+* The shortcode is now registered on the `init` hook, as recommended.
+* Added a `texlab_current_year` filter for developers.
 
 = 1.1.0 =
 * Added proper class-based structure
@@ -77,6 +93,9 @@ Currently, the plugin only displays the year in YYYY format. If you need differe
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.2.0 =
+Compatibility update for WordPress 7.1 plus code hardening and cleanup. The year now follows your site's timezone. Requires WordPress 6.5 and PHP 7.4 or later.
 
 = 1.1.0 =
 This version includes improved code structure and security enhancements. Update recommended for all users.
